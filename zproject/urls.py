@@ -33,6 +33,7 @@ import zerver.views.user_settings
 import zerver.views.muting
 import zerver.views.streams
 import zerver.views.realm
+import zerver.views.digest
 
 from zerver.lib.rest import rest_dispatch
 
@@ -625,6 +626,12 @@ urls += [url(r'^help/(?P<article>.*)$',
 urls += [url(r'^api/(?P<article>[-\w]*\/?)$',
              MarkdownDirectoryView.as_view(template_name='zerver/api/main.html',
                                            path_template='/zerver/api/%s.md'))]
+# Digest urls
+
+def digest(request: HttpRequest) -> HttpResponse:
+   return HttpResponse('<h1>Digest</h1>')
+
+urls += [url(r'^digest/$', zerver.views.digest.digest, name='digest')]
 
 # Two Factor urls
 if settings.TWO_FACTOR_AUTHENTICATION_ENABLED:
