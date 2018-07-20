@@ -628,10 +628,8 @@ urls += [url(r'^api/(?P<article>[-\w]*\/?)$',
                                            path_template='/zerver/api/%s.md'))]
 # Digest urls
 
-def digest(request: HttpRequest) -> HttpResponse:
-   return HttpResponse('<h1>Digest</h1>')
-
-urls += [url(r'^digest/$', zerver.views.digest.digest, name='digest')]
+urls += [url(r'^digest/ui$', zerver.views.digest.ui, name='digest-ui')]
+urls += [url(r'^digest/data$', zerver.views.digest.digest, name='digest')]
 
 # Two Factor urls
 if settings.TWO_FACTOR_AUTHENTICATION_ENABLED:

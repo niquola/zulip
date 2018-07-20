@@ -10,16 +10,42 @@ def fetchall(cursor):
         for row in cursor.fetchall()
     ]
 
-def digest(request: HttpRequest) -> HttpResponse:
-   with connection.cursor() as cursor:
-     cursor.execute('''
-       SELECT s.id, s.name, count(*) as num_messages
-       FROM zerver_stream s
-       JOIN zerver_recipient r ON r.type=2 and  r.type_id=s.id
-       JOIN zerver_message m ON m.recipient_id = r.id
-       GROUP BY s.id, s.name
-       ORDER BY count(*) desc
-     ''')
-     rows = fetchall(cursor)
+def query(sql):
+    with connection.cursor() as cursor:
+        cursor.execute(sql)
+        return fetchall(cursor)
 
-   return HttpResponse('<pre>%s</pre>' % json.dumps(rows, indent=0, sort_keys=False))
+def ui(request: HttpRequest) -> HttpResponse:
+    return HttpResponse('<pre>Hello</pre>')
+
+def digest(request: HttpRequest) -> HttpResponse:
+    resp = []
+    new_streams = query('''
+       SELECT s.id, s.name, s.date_created::date FROM zerver_stream s
+       WHERE date_created > now()  - INTERVAL '1 week'
+       ORDER BY date_created desc
+       LIMIT 10
+    ''')
+
+    resp.append({"title": "New Streams", "type": "streams", "items": new_streams})
+
+    d_hot_topics = query('''
+      SELECT *
+      FROM zerver_message m
+      WHERE m.pub_date > now()  - INTERVAL '1 day'
+      LIMIT 10
+    ''')
+
+    resp.append({"title": "Topics of the week", "type": "topics", "items": d_hot_topics})
+
+    w_hot_topics = query('''
+      SELECT *
+      FROM zerver_message m
+      WHERE m.pub_date > now()  - INTERVAL '1 week'
+      LIMIT 10
+    ''')
+
+    resp.append({"title": "Topics of the day", "type": "topics", "items": w_hot_topics})
+
+
+    return HttpResponse(json.dumps(resp, indent=0, sort_keys=False, default=str), content_type="application/json")

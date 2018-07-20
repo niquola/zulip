@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" href="../../../../favicon.ico">
+
+    <title>Zulip Pulse</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.7.2/angular.min.js"></script>
+    <script src="digest.js"></script>
+    <style>
+     .widget {
+         display: inline-block;
+         vertical-align: top;
+         padding: 10px 20px;
+         width:  350px;
+         margin: 10px;
+         border: 1px solid #ddd;
+     }
+
+    </style>
+  </head>
+
+  <body>
+      <div ng-app="digest" class="container">
+          <div ng-controller="DigestCtl as d">
+              <h1> {{ d.title }} </h1>
+              <hr/>
+              <div class="widget" ng-repeat="widget in d.data">
+                  <h3> {{ widget.title }} </h3>
+                  <div ng-switch="widget.type">
+                      <ul ng-switch-when="streams">
+                          <li ng-repeat="item in widget.items">
+                              <a href="/#narrow/stream/{{item.id}}-{{item.name}}"> {{ item.name }}   <small> {{ item.date_created }} </small></a>
+                          </li>
+                      </ul>
+                      <ul ng-switch-when="topics">
+                          <li ng-repeat="item in widget.items">
+                              <div> {{ item.content }} </div>
+                              <div> {{ item.pub_date }} </div>
+                              <pre> {{ item | json }} </pre>
+                          </li>
+                      </ul>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </body>
+</html>
